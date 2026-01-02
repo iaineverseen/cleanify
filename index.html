@@ -351,12 +351,21 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        let currentFilename = 'output.lua';
+        let currentFilename = generateRandomFilename();
         let processingStats = {
             commentsRemoved: 0,
             inputSize: 0,
             outputSize: 0
         };
+
+        function generateRandomFilename() {
+            const chars = '0123456789abcdef';
+            let result = '';
+            for (let i = 0; i < 24; i++) {
+                result += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return result + '.lua';
+        }
 
         const dropZone = document.getElementById('dropZone');
         
@@ -711,7 +720,7 @@
                 return;
             }
 
-            currentFilename = file.name.replace(/\.(lua|txt)$/, '') + '_no_comments.lua';
+            currentFilename = generateRandomFilename();
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -749,7 +758,7 @@
         function clearInput() {
             document.getElementById('input').value = '';
             document.getElementById('output').value = '';
-            currentFilename = 'output.lua';
+            currentFilename = generateRandomFilename();
             document.getElementById('inputLines').textContent = '0';
             document.getElementById('outputLines').textContent = '0';
             document.getElementById('commentsRemoved').textContent = '0';
