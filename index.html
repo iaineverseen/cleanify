@@ -971,7 +971,12 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('input').value = e.target.result;
-                removeComments();
+                
+                // Only auto-process if live processing is enabled
+                if (document.getElementById('liveProcessing').checked) {
+                    removeComments();
+                }
+                
                 showToast('File loaded: ' + file.name);
             };
             reader.onerror = function() {
