@@ -44,23 +44,19 @@
   </head>
 
   <body class="min-h-screen text-white">
-    <div class="max-w-3xl mx-auto p-6 md:p-8">
+    <div class="max-w-2xl mx-auto p-6 md:p-8">
       <!-- Header -->
-      <div class="mb-10">
-        <h1 class="text-2xl font-semibold text-slate-100 mb-2">Lua Compressor</h1>
-        <p class="text-sm text-slate-400">Minify and compress Lua code in your browser</p>
+      <div class="mb-8">
+        <h1 class="text-xl font-medium text-slate-100">Lua Compressor</h1>
       </div>
 
       <!-- Input Section -->
-      <div class="mb-6">
-        <div class="flex items-center justify-between mb-3">
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-3">
-            <h2 class="text-base font-medium text-slate-300">Input</h2>
-            <label class="cursor-pointer text-sm text-slate-400 hover:text-blue-400 transition flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-              </svg>
-              <span>Upload .lua/.txt</span>
+            <span class="text-sm text-slate-400">Input</span>
+            <label class="cursor-pointer text-sm text-slate-300 hover:text-white transition bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded">
+              <span>Upload</span>
               <input type="file" id="fileInput" accept=".lua,.txt" class="hidden" />
             </label>
           </div>
@@ -69,37 +65,34 @@
 
         <textarea
           id="input"
-          class="code-font w-full h-64 p-4 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 focus:outline-none text-sm text-slate-200"
-          placeholder="Paste your Lua code here or upload a .lua/.txt file..."
+          class="code-font w-full h-48 p-3 bg-slate-900 border border-slate-700 rounded focus:border-slate-600 focus:outline-none text-sm text-slate-200"
+          placeholder="Paste your Lua code here..."
         ></textarea>
       </div>
 
       <!-- Compress Button -->
-      <div class="mb-6">
+      <div class="mb-4">
         <button
           onclick="compress()"
-          class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition active:scale-95"
+          class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 rounded font-medium text-sm transition"
         >
           Compress
         </button>
       </div>
 
       <!-- Output Section -->
-      <div class="mb-6">
-        <div class="flex items-center justify-between mb-3">
+      <div>
+        <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-3">
-            <h2 class="text-base font-medium text-slate-300">Output</h2>
-            <div id="ratio" class="text-xs text-green-400"></div>
+            <span class="text-sm text-slate-400">Output</span>
+            <div id="ratio" class="text-xs"></div>
           </div>
           <div class="flex items-center gap-3">
             <div class="text-xs text-slate-500" id="outputSize">0 bytes</div>
             <button
               onclick="downloadOutput()"
-              class="text-sm text-slate-400 hover:text-blue-400 transition flex items-center gap-1"
+              class="text-sm text-slate-300 hover:text-white transition bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
               Download
             </button>
           </div>
@@ -107,30 +100,17 @@
 
         <textarea
           id="output"
-          class="code-font w-full h-64 p-4 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 focus:outline-none text-sm text-slate-200"
-          placeholder="Compressed output will appear here..."
+          class="code-font w-full h-48 p-3 bg-slate-900 border border-slate-700 rounded focus:border-slate-600 focus:outline-none text-sm text-slate-200"
+          placeholder="Compressed output..."
           readonly
         ></textarea>
-      </div>
-
-      <!-- Info -->
-      <div class="card rounded-lg p-4">
-        <div class="flex items-start gap-3">
-          <svg class="w-5 h-5 text-slate-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <p class="text-sm text-slate-300 mb-1">All processing happens locally in your browser</p>
-            <p class="text-xs text-slate-500">Only .lua and .txt files are accepted. No data is sent to servers.</p>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Toast -->
     <div
       id="toast"
-      class="fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-3 bg-slate-800 border border-slate-700 text-white text-sm rounded-lg shadow-lg opacity-0 transition-all duration-300 pointer-events-none"
+      class="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 bg-slate-800 border border-slate-700 text-white text-xs rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none"
     ></div>
 
     <script>
@@ -442,7 +422,8 @@
       function formatBytes(b) {
         if (!b) return '0 bytes';
         if (b < 1024) return b + ' bytes';
-        return (b / 1024).toFixed(1) + ' KB';
+        if (b < 1024 * 1024) return (b / 1024).toFixed(2) + ' KB';
+        return (b / (1024 * 1024)).toFixed(2) + ' MB';
       }
 
       function updateSizes() {
@@ -468,7 +449,14 @@
         }
       }
 
-      input.addEventListener('input', updateSizes);
+      input.addEventListener('input', () => {
+        updateSizes();
+        // Clear output when input changes to reset ratio
+        if (output.value) {
+          output.value = '';
+          updateSizes();
+        }
+      });
 
       function compress() {
         if (!input.value.trim()) {
@@ -529,6 +517,7 @@
         const r = new FileReader();
         r.onload = e => {
           input.value = e.target.result;
+          output.value = ''; // Clear output when new file is loaded
           updateSizes();
           toast('File loaded successfully');
         };
