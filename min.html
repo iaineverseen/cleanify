@@ -60,7 +60,7 @@
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
               </svg>
-              <span>Upload</span>
+              <span>Upload .lua/.txt</span>
               <input type="file" id="fileInput" accept=".lua,.txt" class="hidden" />
             </label>
           </div>
@@ -70,7 +70,7 @@
         <textarea
           id="input"
           class="code-font w-full h-64 p-4 bg-slate-900 border border-slate-700 rounded-lg focus:border-blue-500 focus:outline-none text-sm text-slate-200"
-          placeholder="Paste your Lua code here..."
+          placeholder="Paste your Lua code here or upload a .lua/.txt file..."
         ></textarea>
       </div>
 
@@ -121,7 +121,7 @@
           </svg>
           <div>
             <p class="text-sm text-slate-300 mb-1">All processing happens locally in your browser</p>
-            <p class="text-xs text-slate-500">No data is sent to any server. Your code stays private.</p>
+            <p class="text-xs text-slate-500">Only .lua and .txt files are accepted. No data is sent to servers.</p>
           </div>
         </div>
       </div>
@@ -380,7 +380,7 @@
 
       function compress() {
         if (!input.value.trim()) {
-          toast('Enter some code first', true);
+          toast('Enter some Lua code first', true);
           return;
         }
         
@@ -413,11 +413,24 @@
       }
 
       document.getElementById('fileInput').addEventListener('change', e => {
-        const f = e.target.files[0];
+        const fileInput = e.target;
+        const f = fileInput.files[0];
+        
         if (!f) return;
+        
+        // Validate file type by extension
+        const fileName = f.name.toLowerCase();
+        const isValidExtension = fileName.endsWith('.lua') || fileName.endsWith('.txt');
+        
+        if (!isValidExtension) {
+          toast('Only .lua and .txt files are allowed', true);
+          fileInput.value = ''; // Clear the file input
+          return;
+        }
         
         if (f.size > 5 * 1024 * 1024) {
           toast('File too large (max 5MB)', true);
+          fileInput.value = ''; // Clear the file input
           return;
         }
         
@@ -425,10 +438,11 @@
         r.onload = e => {
           input.value = e.target.result;
           updateSizes();
-          toast('File loaded');
+          toast('File loaded successfully');
         };
         r.onerror = () => {
           toast('Failed to read file', true);
+          fileInput.value = ''; // Clear the file input
         };
         r.readAsText(f);
       });
