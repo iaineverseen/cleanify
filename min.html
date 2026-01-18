@@ -360,6 +360,8 @@
         }
       };
 
+      let currentFileName = 'compressed'; // Track the current file name
+
       const input = document.getElementById('input');
       const output = document.getElementById('output');
       const inputSize = document.getElementById('inputSize');
@@ -430,7 +432,7 @@
         try {
           const a = document.createElement('a');
           a.href = URL.createObjectURL(new Blob([output.value], { type: 'text/plain' }));
-          a.download = 'compressed.lua';
+          a.download = `${currentFileName}.min.txt`;
           a.click();
           URL.revokeObjectURL(a.href);
           toast('Download started');
@@ -454,6 +456,10 @@
           fileInput.value = ''; // Clear the file input
           return;
         }
+        
+        // Store filename without extension for download
+        const nameWithoutExt = f.name.replace(/\.(lua|txt)$/i, '');
+        currentFileName = nameWithoutExt;
         
         // More accurate file size check (5MB = 5,242,880 bytes)
         const maxSize = 5 * 1024 * 1024; // Exactly 5MB in bytes
