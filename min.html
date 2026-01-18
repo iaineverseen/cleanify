@@ -213,7 +213,7 @@
       }
 
       const LZW = {
-        CHARS: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-*/=<>!@#$%^&()[]{}|;:,.?~ ',
+        CHARS: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-*/=<>!@#$%^&()[]{}|;:,.?~_`\'"\\',
 
         encode(codes) {
           if (!Array.isArray(codes) || codes.length === 0) {
@@ -248,7 +248,7 @@
 
           if (nb > 0) bytes.push(bits & 255);
 
-          // Use base85 encoding for better compression
+          // Use base91 encoding for better compression (more characters)
           let out = '';
           for (let i = 0; i < bytes.length; i += 4) {
             let v =
@@ -258,13 +258,14 @@
               ((bytes[i + 3] || 0) << 24);
 
             v >>>= 0;
+            const base = this.CHARS.length;
             for (let j = 0; j < 5; j++) {
-              const idx = v % 85;
+              const idx = v % base;
               if (idx < 0 || idx >= this.CHARS.length) {
                 throw new Error('Encoding index out of range');
               }
               out += this.CHARS[idx];
-              v = Math.floor(v / 85);
+              v = Math.floor(v / base);
             }
           }
           return out;
@@ -297,7 +298,23 @@
               throw new Error('No compressible content found');
             }
 
-            // Improved LZW compression with larger dictionary
+            // Minimum file size check - reject files smaller than 1KB
+            if (bytes.length < 1024) {
+              throw new Error('File too small. Minimum size is 1KB (1,024 bytes). Your file is ' + bytes.length + ' bytes.');
+            }
+
+            // Adaptive dictionary size based on input size for better compression on larger files
+            const inputSize = bytes.length;
+            let maxDictSize;
+            
+            if (inputSize < 5120) {
+              maxDictSize = 8192; // Small files (<5KB): 13-bit dictionary
+            } else if (inputSize < 51200) {
+              maxDictSize = 32768; // Medium files (5-50KB): 15-bit dictionary
+            } else {
+              maxDictSize = 65536; // Large files (>50KB): 16-bit dictionary (maximum)
+            }
+
             const dict = new Map();
             for (let i = 0; i < 256; i++) {
               dict.set(String.fromCharCode(i), i);
@@ -306,7 +323,6 @@
             let w = '';
             let size = 256;
             const codes = [];
-            const maxDictSize = 65536; // Use full 16-bit range
 
             for (const b of bytes) {
               const c = String.fromCharCode(b);
@@ -344,16 +360,17 @@
             }
 
             // Escape any characters that could break the Lua string
-            const escapedEnc = enc.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-            const escapedChars = this.CHARS.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+            const escapedEnc = enc.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
+            const escapedChars = this.CHARS.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
 
             // Validate the output won't be too large
             if (codes.length > 1000000) {
               throw new Error('Compressed output too large');
             }
 
-            // Ultra-optimized and compact decompressor wrapper
-            return `return(function(s,n)local C="${escapedChars}"local B,b,w,t,z={},0,9,512,258;for i=1,#s,5 do local v=0;for j=0,4 do v=v+((C:find(s:sub(i+j,i+j),1,1)or 1)-1)*85^j end;for k=0,3 do B[#B+1]=v//256^k%256 end end;local E,x,y={},1,0;for i=1,n do while y<w do b=b+(B[x]or 0)*2^y;x=x+1;y=y+8 end;E[i]=b%2^w;b=b//2^w;y=y-w;z=z+1;if z>t and w<16 then w=w+1;t=t*2 end end;local D,R={},{}for i=0,255 do D[i]=string.char(i)end;local p=D[E[1]]or""R[1]=p;local d=256;for i=2,n do local c=E[i]local e=D[c]if e then R[i]=e;if p~=""then D[d]=p..e:sub(1,1)end elseif c==d then e=p..p:sub(1,1);R[i]=e;D[d]=e else R[i]=""end;d=d+1;p=e or p end;return loadstring(table.concat(R))end)("${escapedEnc}",${codes.length})(...)`;
+            // Ultra-optimized and compact decompressor wrapper (updated for base91)
+            const base = this.CHARS.length;
+            return `return(function(s,n)local C="${escapedChars}"local B,b,w,t,z={},0,9,512,258;for i=1,#s,5 do local v=0;for j=0,4 do v=v+((C:find(s:sub(i+j,i+j),1,1)or 1)-1)*${base}^j end;for k=0,3 do B[#B+1]=v//256^k%256 end end;local E,x,y={},1,0;for i=1,n do while y<w do b=b+(B[x]or 0)*2^y;x=x+1;y=y+8 end;E[i]=b%2^w;b=b//2^w;y=y-w;z=z+1;if z>t and w<16 then w=w+1;t=t*2 end end;local D,R={},{}for i=0,255 do D[i]=string.char(i)end;local p=D[E[1]]or""R[1]=p;local d=256;for i=2,n do local c=E[i]local e=D[c]if e then R[i]=e;if p~=""then D[d]=p..e:sub(1,1)end elseif c==d then e=p..p:sub(1,1);R[i]=e;D[d]=e else R[i]=""end;d=d+1;p=e or p end;return loadstring(table.concat(R))end)("${escapedEnc}",${codes.length})(...)`;
           } catch (error) {
             throw new Error(`Compression failed: ${error.message}`);
           }
