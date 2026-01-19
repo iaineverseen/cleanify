@@ -4,198 +4,289 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lua Compressor</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
-
-      body {
-        font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
 
-      .code-font {
-        font-family: 'JetBrains Mono', monospace;
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #0a0e1a;
+        color: #e2e8f0;
+        padding: 20px;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      h1 {
+        font-size: 28px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 8px;
+      }
+
+      .subtitle {
+        color: #94a3b8;
+        font-size: 14px;
+      }
+
+      .section {
+        background: #151b2b;
+        border: 1px solid #1f2937;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .section-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .file-size {
+        font-size: 12px;
+        color: #64748b;
       }
 
       textarea {
+        width: 100%;
+        height: 200px;
+        background: #0a0e1a;
+        border: 1px solid #1f2937;
+        border-radius: 6px;
+        padding: 12px;
+        color: #e2e8f0;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
         resize: none;
-        transition: all 0.2s ease;
+        outline: none;
       }
 
       textarea:focus {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
+        border-color: #3b82f6;
       }
 
-      textarea::-webkit-scrollbar {
-        width: 8px;
+      textarea::placeholder {
+        color: #475569;
       }
 
-      textarea::-webkit-scrollbar-track {
-        background: #1e293b;
-        border-radius: 4px;
+      .btn-group {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
       }
 
-      textarea::-webkit-scrollbar-thumb {
-        background: #475569;
-        border-radius: 4px;
+      button, .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
       }
 
-      textarea::-webkit-scrollbar-thumb:hover {
-        background: #64748b;
+      .btn-primary {
+        background: #3b82f6;
+        color: #fff;
+        flex: 1;
       }
 
-      button, label {
-        transition: all 0.15s ease;
+      .btn-primary:hover {
+        background: #2563eb;
       }
 
-      button:hover {
-        transform: translateY(-1px);
+      .btn-secondary {
+        background: #1f2937;
+        color: #e2e8f0;
+        border: 1px solid #374151;
       }
 
-      button:active {
-        transform: scale(0.98);
+      .btn-secondary:hover {
+        background: #374151;
       }
 
-      .glow {
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+      .btn-success {
+        background: #10b981;
+        color: #fff;
       }
 
-      .glow:hover {
-        box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+      .btn-success:hover {
+        background: #059669;
       }
-      
-      #toast {
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+      }
+
+      .stat-card {
+        background: #0a0e1a;
+        border: 1px solid #1f2937;
+        border-radius: 6px;
+        padding: 16px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+      }
+
+      .stat-value {
+        font-size: 20px;
+        font-weight: 600;
+        color: #3b82f6;
+      }
+
+      .stat-value.success {
+        color: #10b981;
+      }
+
+      .stat-value.error {
+        color: #ef4444;
+      }
+
+      .toast {
         position: fixed;
-        bottom: 1rem;
+        bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 9999;
+        background: #1f2937;
+        border: 1px solid #374151;
+        padding: 12px 20px;
+        border-radius: 6px;
+        font-size: 14px;
         opacity: 0;
-        transition: opacity 0.3s ease, bottom 0.3s ease;
+        transition: opacity 0.3s;
+        z-index: 1000;
+      }
+
+      .toast.show {
+        opacity: 1;
+      }
+
+      .toast.success {
+        background: #065f46;
+        border-color: #10b981;
+      }
+
+      .toast.error {
+        background: #7f1d1d;
+        border-color: #ef4444;
+      }
+
+      input[type="file"] {
+        display: none;
+      }
+
+      .info {
+        text-align: center;
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 30px;
+        padding: 12px;
+        background: #0a0e1a;
+        border: 1px solid #1f2937;
+        border-radius: 6px;
+      }
+
+      @media (max-width: 600px) {
+        .btn-group {
+          flex-direction: column;
+        }
+        
+        .stats {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Lua Compressor</h1>
+        <p class="subtitle">Compress your Lua code efficiently</p>
+      </header>
 
-  <body class="min-h-screen text-gray-200">
-    <div class="max-w-2xl mx-auto p-6">
-      <!-- Header -->
-      <div class="mb-8 text-center">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl mb-3 shadow-lg glow">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">Input Code</span>
+          <span class="file-size" id="inputSize">0 bytes</span>
         </div>
-        <h1 class="text-3xl font-bold text-white mb-2">Lua Compressor</h1>
+        <textarea id="input" placeholder="Paste your Lua code here..."></textarea>
       </div>
 
-      <!-- Input Section -->
-      <div class="mb-6 bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-5 shadow-2xl border border-slate-700">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Input Lua Code</span>
-            <div class="text-xs text-gray-400" id="inputSize">0 bytes</div>
-          </div>
-          <div class="flex items-center gap-2">
-            <label class="cursor-pointer text-sm text-white transition bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-4 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl">
-              <span class="flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                </svg>
-                Upload File
-              </span>
-              <input type="file" id="fileInput" accept=".lua,.txt" class="hidden" />
-            </label>
-          </div>
-        </div>
-
-        <textarea
-          id="input"
-          class="code-font w-full h-48 p-4 bg-slate-950/80 border border-slate-600 rounded-lg text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-500"
-          placeholder="Paste your Lua code here..."
-        ></textarea>
+      <div class="btn-group">
+        <label class="btn btn-secondary">
+          Upload File
+          <input type="file" id="fileInput" accept=".lua,.txt" />
+        </label>
+        <button class="btn btn-primary" onclick="compress()">Compress Code</button>
       </div>
 
-      <!-- Compress Button -->
-      <div class="mb-6">
-        <button
-          onclick="compress()"
-          class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg text-base transition-all duration-300 shadow-xl hover:shadow-2xl glow active:shadow-lg"
-        >
-          <div class="flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-            </svg>
-            Compress Code
-          </div>
-        </button>
-      </div>
-
-      <!-- Output Section -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-5 shadow-2xl border border-slate-700">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-3">
-            <span class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Compressed Output</span>
-            <div id="ratio" class="text-sm font-medium"></div>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="text-sm text-gray-400" id="outputSize">0 bytes</div>
-            <button
-              onclick="downloadOutput()"
-              class="flex items-center gap-2 text-sm text-white transition bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 px-4 py-2 rounded-lg font-medium shadow-lg hover:shadow-xl"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">Output</span>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="file-size" id="outputSize">0 bytes</span>
+            <button class="btn btn-success" onclick="downloadOutput()" style="padding: 8px 16px; font-size: 13px;">
               Download
             </button>
           </div>
         </div>
-
-        <textarea
-          id="output"
-          class="code-font w-full h-48 p-4 bg-slate-950/80 border border-slate-600 rounded-lg text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder-gray-500"
-          placeholder="Compressed output will appear here..."
-          readonly
-        ></textarea>
+        <textarea id="output" placeholder="Compressed output will appear here..." readonly></textarea>
       </div>
 
-      <!-- Stats Card -->
-      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-5 rounded-xl border border-slate-700 shadow-xl">
-          <div class="text-xs text-gray-400 mb-1">Compression Ratio</div>
-          <div id="ratioNumber" class="text-2xl font-bold text-blue-400">0%</div>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-label">Compression</div>
+          <div class="stat-value" id="ratioNumber">0%</div>
         </div>
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-5 rounded-xl border border-slate-700 shadow-xl">
-          <div class="text-xs text-gray-400 mb-1">Space Saved</div>
-          <div id="spaceSaved" class="text-2xl font-bold text-emerald-400">0 bytes</div>
+        <div class="stat-card">
+          <div class="stat-label">Space Saved</div>
+          <div class="stat-value" id="spaceSaved">0 bytes</div>
         </div>
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-5 rounded-xl border border-slate-700 shadow-xl">
-          <div class="text-xs text-gray-400 mb-1">Processing Time</div>
-          <div id="processingTime" class="text-2xl font-bold text-purple-400">0ms</div>
+        <div class="stat-card">
+          <div class="stat-label">Time</div>
+          <div class="stat-value" id="processingTime">0ms</div>
         </div>
       </div>
 
-      <!-- Info Section -->
-      <div class="mt-8 text-center text-gray-400 text-sm">
-        <p class="bg-slate-900/50 border border-slate-700 rounded-lg p-3 inline-block">
-          <span class="text-blue-400 font-medium">ℹ️</span> Supports Lua files up to 5MB
-        </p>
+      <div class="info">
+        Supports Lua files up to 5MB • Minimum 1.5KB
       </div>
     </div>
 
-    <!-- Toast - Simple fixed positioning -->
-    <div
-      id="toast"
-      class="px-6 py-3 bg-gradient-to-r from-slate-900 to-slate-800 text-white text-sm rounded-lg shadow-2xl flex items-center gap-2 border border-slate-700"
-    >
-      <svg id="toastIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-      </svg>
-      <span id="toastMessage"></span>
-    </div>
+    <div id="toast" class="toast"></div>
 
     <script>
       function removeLuaComments(code) {
@@ -448,7 +539,6 @@
       const output = document.getElementById('output');
       const inputSize = document.getElementById('inputSize');
       const outputSize = document.getElementById('outputSize');
-      const ratio = document.getElementById('ratio');
       const ratioNumber = document.getElementById('ratioNumber');
       const spaceSaved = document.getElementById('spaceSaved');
       const processingTime = document.getElementById('processingTime');
@@ -474,23 +564,16 @@
           spaceSaved.textContent = formatBytes(saved);
           
           if (p > 0) {
-            ratio.textContent = `${p}% smaller`;
-            ratio.className = 'text-sm font-semibold text-emerald-400';
-            ratioNumber.className = 'text-2xl font-bold text-emerald-400';
+            ratioNumber.className = 'stat-value success';
           } else if (p < 0) {
-            ratio.textContent = `${Math.abs(p)}% larger`;
-            ratio.className = 'text-sm font-semibold text-red-400';
-            ratioNumber.className = 'text-2xl font-bold text-red-400';
+            ratioNumber.className = 'stat-value error';
           } else {
-            ratio.textContent = 'same size';
-            ratio.className = 'text-sm font-semibold text-gray-400';
-            ratioNumber.className = 'text-2xl font-bold text-gray-400';
+            ratioNumber.className = 'stat-value';
           }
         } else {
-          ratio.textContent = '';
           ratioNumber.textContent = '0%';
           spaceSaved.textContent = '0 bytes';
-          ratioNumber.className = 'text-2xl font-bold text-blue-400';
+          ratioNumber.className = 'stat-value';
         }
       }
 
@@ -593,34 +676,11 @@
 
       function toast(msg, isError = false) {
         const t = document.getElementById('toast');
-        const icon = document.getElementById('toastIcon');
-        const message = document.getElementById('toastMessage');
+        t.textContent = msg;
+        t.className = 'toast show ' + (isError ? 'error' : 'success');
         
-        message.textContent = msg;
-        
-        // Set position and styling
-        t.style.position = 'fixed';
-        t.style.bottom = '1rem';
-        t.style.left = '50%';
-        t.style.transform = 'translateX(-50%)';
-        t.style.zIndex = '9999';
-        
-        if (isError) {
-          t.style.background = 'linear-gradient(to right, #991b1b, #7f1d1d)';
-          t.style.borderColor = '#dc2626';
-          icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
-        } else {
-          t.style.background = 'linear-gradient(to right, #065f46, #047857)';
-          t.style.borderColor = '#10b981';
-          icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
-        }
-        
-        // Show toast
-        t.style.opacity = '1';
-        
-        // Hide after 3 seconds
         setTimeout(() => {
-          t.style.opacity = '0';
+          t.className = 'toast';
         }, 3000);
       }
 
