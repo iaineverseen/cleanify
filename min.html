@@ -1,731 +1,1 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lua Compressor</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-      }
-
-      textarea {
-        -webkit-user-select: text;
-        -moz-user-select: text;
-        -ms-user-select: text;
-        user-select: text;
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        background: #0a0e1a;
-        color: #e2e8f0;
-        padding: 20px;
-        line-height: 1.6;
-      }
-
-      .container {
-        max-width: 900px;
-        margin: 0 auto;
-      }
-
-      header {
-        text-align: center;
-        margin-bottom: 40px;
-      }
-
-      h1 {
-        font-size: 28px;
-        font-weight: 600;
-        color: #fff;
-        margin-bottom: 8px;
-      }
-
-      .subtitle {
-        color: #94a3b8;
-        font-size: 14px;
-      }
-
-      .section {
-        background: #151b2b;
-        border: 1px solid #1f2937;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-      }
-
-      .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-      }
-
-      .section-title {
-        font-size: 13px;
-        font-weight: 600;
-        color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .file-size {
-        font-size: 12px;
-        color: #64748b;
-      }
-
-      textarea {
-        width: 100%;
-        height: 200px;
-        background: #0a0e1a;
-        border: 1px solid #1f2937;
-        border-radius: 6px;
-        padding: 12px;
-        color: #e2e8f0;
-        font-family: 'Courier New', monospace;
-        font-size: 13px;
-        resize: none;
-        outline: none;
-      }
-
-      textarea:focus {
-        border-color: #3b82f6;
-      }
-
-      textarea::placeholder {
-        color: #475569;
-      }
-
-      .btn-group {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 20px;
-      }
-
-      button, .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        outline: none;
-        position: relative;
-        width: 100%;
-        box-sizing: border-box;
-      }
-
-      button:active, .btn:active {
-        transform: scale(0.97);
-      }
-
-      button::after, .btn::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border-radius: 6px;
-        background: rgba(255, 255, 255, 0.1);
-        opacity: 0;
-        transition: opacity 0.3s;
-        pointer-events: none;
-      }
-
-      button:active::after, .btn:active::after {
-        opacity: 1;
-        transition: opacity 0s;
-      }
-
-      .btn-primary {
-        background: #3b82f6;
-        color: #fff;
-        flex: 1;
-      }
-
-      .btn-primary:hover {
-        background: #2563eb;
-      }
-
-      .btn-secondary {
-        background: #1f2937;
-        color: #e2e8f0;
-        border: 1px solid #374151;
-        flex: 1;
-      }
-
-      .btn-secondary:hover {
-        background: #374151;
-      }
-
-      .btn-success {
-        background: #10b981;
-        color: #fff;
-      }
-
-      .btn-success:hover {
-        background: #059669;
-      }
-
-      .stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 12px;
-      }
-
-      .stat-card {
-        background: #0a0e1a;
-        border: 1px solid #1f2937;
-        border-radius: 6px;
-        padding: 16px;
-      }
-
-      .stat-label {
-        font-size: 11px;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
-      }
-
-      .stat-value {
-        font-size: 20px;
-        font-weight: 600;
-        color: #3b82f6;
-      }
-
-      .stat-value.success {
-        color: #10b981;
-      }
-
-      .stat-value.error {
-        color: #ef4444;
-      }
-
-      .toast {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #1f2937;
-        border: 1px solid #374151;
-        padding: 12px 20px;
-        border-radius: 6px;
-        font-size: 14px;
-        opacity: 0;
-        transition: opacity 0.3s;
-        z-index: 1000;
-      }
-
-      .toast.show {
-        opacity: 1;
-      }
-
-      .toast.success {
-        background: #065f46;
-        border-color: #10b981;
-      }
-
-      .toast.error {
-        background: #7f1d1d;
-        border-color: #ef4444;
-      }
-
-      input[type="file"] {
-        display: none;
-      }
-
-      .info {
-        text-align: center;
-        color: #64748b;
-        font-size: 12px;
-        margin-top: 30px;
-        padding: 12px;
-        background: #0a0e1a;
-        border: 1px solid #1f2937;
-        border-radius: 6px;
-      }
-
-      @media (max-width: 600px) {
-        .btn-group {
-          flex-direction: column;
-        }
-        
-        .stats {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1>Lua Compressor</h1>
-        <p class="subtitle">Compress your Lua code efficiently</p>
-      </header>
-
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title">Input Code</span>
-          <span class="file-size" id="inputSize">0 bytes</span>
-        </div>
-        <textarea id="input" placeholder="Paste your Lua code here..."></textarea>
-      </div>
-
-      <div class="btn-group">
-        <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
-          Upload File
-        </button>
-        <input type="file" id="fileInput" accept=".lua,.txt" style="display: none;" />
-        <button class="btn btn-primary" onclick="compress()">Compress Code</button>
-      </div>
-
-      <div class="section">
-        <div class="section-header">
-          <span class="section-title">Output</span>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="file-size" id="outputSize">0 bytes</span>
-            <button class="btn btn-success" onclick="downloadOutput()" style="padding: 8px 16px; font-size: 13px;">
-              Download
-            </button>
-          </div>
-        </div>
-        <textarea id="output" placeholder="Compressed output will appear here..." readonly></textarea>
-      </div>
-
-      <div class="stats">
-        <div class="stat-card">
-          <div class="stat-label">Compression</div>
-          <div class="stat-value" id="ratioNumber">0%</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Space Saved</div>
-          <div class="stat-value" id="spaceSaved">0 bytes</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Time</div>
-          <div class="stat-value" id="processingTime">0ms</div>
-        </div>
-      </div>
-
-      <div class="info">
-        Supports Lua files up to 5MB • Minimum 1.5KB
-      </div>
-    </div>
-
-    <div id="toast" class="toast"></div>
-
-    <script>
-      function removeLuaComments(code) {
-        let result = '';
-        let i = 0;
-        const len = code.length;
-
-        while (i < len) {
-          const char = code[i];
-
-          if (char !== '-' && char !== '"' && char !== "'" && char !== '[') {
-            result += char;
-            i++;
-            continue;
-          }
-
-          const nextChar = code[i + 1] || '';
-
-          if (char === '"' || char === "'") {
-            const r = parseStringFast(code, i, char, len);
-            result += r.content;
-            i = r.endIndex;
-            continue;
-          }
-
-          if (char === '[') {
-            const lb = matchLongBracketFast(code, i, false, len);
-            if (lb) {
-              result += lb.content;
-              i = lb.endIndex;
-              continue;
-            }
-            result += char;
-            i++;
-            continue;
-          }
-
-          if (char === '-' && nextChar === '-') {
-            const after = i + 2;
-            if (code[after] === '[') {
-              const lb = matchLongBracketFast(code, after, true, len);
-              if (lb) {
-                i = lb.endIndex;
-                if (code[i] === '\n') result += '\n', i++;
-                continue;
-              }
-            }
-            while (i < len && code[i] !== '\n') i++;
-            if (code[i] === '\n') result += '\n', i++;
-            continue;
-          }
-
-          result += char;
-          i++;
-        }
-        return result;
-      }
-
-      function parseStringFast(code, start, quote, len) {
-        let out = code[start];
-        let i = start + 1;
-
-        while (i < len) {
-          const c = code[i];
-          if (c === quote) {
-            out += c;
-            i++;
-            break;
-          }
-          if (c === '\\' && i + 1 < len) {
-            out += c + code[i + 1];
-            i += 2;
-            continue;
-          }
-          out += c;
-          i++;
-        }
-
-        return { content: out, endIndex: i };
-      }
-
-      function matchLongBracketFast(code, start, isComment, len) {
-        if (code[start] !== '[') return null;
-        let i = start + 1;
-        let eq = 0;
-
-        while (code[i] === '=') eq++, i++;
-        if (code[i] !== '[') return null;
-        i++;
-
-        const close = ']' + '='.repeat(eq) + ']';
-        const end = code.indexOf(close, i);
-        if (end === -1) return null;
-
-        return {
-          content: isComment ? '' : code.slice(start, end + close.length),
-          endIndex: end + close.length
-        };
-      }
-
-      const LZW = {
-        CHARS: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,-./:;<=>?@[]^_`{|}~"',
-
-        encode(codes) {
-          if (!Array.isArray(codes) || codes.length === 0) {
-            throw new Error('Invalid codes array');
-          }
-
-          const bytes = [];
-          let bits = 0, nb = 0;
-          let width = 9, limit = 512, size = 258;
-
-          for (let i = 0; i < codes.length; i++) {
-            const c = codes[i];
-            if (typeof c !== 'number' || c < 0 || c > 65535 || !Number.isFinite(c)) {
-              throw new Error(`Invalid code at index ${i}: ${c}`);
-            }
-
-            bits |= c << nb;
-            nb += width;
-
-            while (nb >= 8) {
-              bytes.push(bits & 255);
-              bits >>= 8;
-              nb -= 8;
-            }
-
-            size++;
-            if (size > limit && width < 16) {
-              width++;
-              limit <<= 1;
-            }
-          }
-
-          if (nb > 0) bytes.push(bits & 255);
-
-          let out = '';
-          for (let i = 0; i < bytes.length; i += 4) {
-            let v =
-              (bytes[i] || 0) |
-              ((bytes[i + 1] || 0) << 8) |
-              ((bytes[i + 2] || 0) << 16) |
-              ((bytes[i + 3] || 0) << 24);
-
-            v >>>= 0;
-            
-            for (let j = 0; j < 5; j++) {
-              if (v === 0 && j > 0) break;
-              
-              const idx = v % 91;
-              if (idx < 0 || idx >= this.CHARS.length) {
-                throw new Error('Encoding index out of range');
-              }
-              out += this.CHARS[idx];
-              v = Math.floor(v / 91);
-            }
-          }
-          return out;
-        },
-
-        compress(input) {
-          try {
-            if (typeof input !== 'string') {
-              throw new Error('Input must be a string');
-            }
-
-            if (input.trim().length === 0) {
-              throw new Error('Input is empty');
-            }
-
-            let cleaned = removeLuaComments(input);
-            if (!cleaned.trim()) {
-              throw new Error('No code remaining after removing comments');
-            }
-
-            const encoder = new TextEncoder();
-            let bytes;
-            try {
-              bytes = encoder.encode(cleaned);
-            } catch (encodeError) {
-              throw new Error('Invalid Unicode characters in code');
-            }
-
-            if (bytes.length === 0) {
-              throw new Error('No compressible content found');
-            }
-
-            const dict = new Map();
-            for (let i = 0; i < 256; i++) {
-              dict.set(String.fromCharCode(i), i);
-            }
-
-            let w = '';
-            let size = 256;
-            const codes = [];
-            const maxDictSize = 65536;
-
-            for (const b of bytes) {
-              const c = String.fromCharCode(b);
-              const wc = w + c;
-              if (dict.has(wc)) {
-                w = wc;
-              } else {
-                const code = dict.get(w);
-                if (code === undefined) {
-                  throw new Error('Dictionary lookup failed');
-                }
-                codes.push(code);
-                if (size < maxDictSize) {
-                  dict.set(wc, size++);
-                }
-                w = c;
-              }
-            }
-            
-            if (w) {
-              const code = dict.get(w);
-              if (code === undefined) {
-                throw new Error('Final dictionary lookup failed');
-              }
-              codes.push(code);
-            }
-
-            if (codes.length === 0) {
-              throw new Error('No compressible content found');
-            }
-
-            const enc = this.encode(codes);
-            if (!enc || enc.length === 0) {
-              throw new Error('Encoding failed');
-            }
-
-            const escapedEnc = enc.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-            const escapedChars = this.CHARS.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-
-            if (codes.length > 1000000) {
-              throw new Error('Compressed output too large');
-            }
-
-            return `return(function(s,n)local C="${escapedChars}"local B,b,w,t,z={},0,9,512,258;for i=1,#s,5 do local v=0;for j=0,4 do local idx=(C:find(s:sub(i+j,i+j),1,1)or 1)-1;v=v+idx*91^j end;for k=0,3 do B[#B+1]=v//256^k%256 end end;local E,x,y={},1,0;for i=1,n do while y<w do b=b+(B[x]or 0)*2^y;x=x+1;y=y+8 end;E[i]=b%2^w;b=b//2^w;y=y-w;z=z+1;if z>t and w<16 then w=w+1;t=t*2 end end;local D,R={},{}for i=0,255 do D[i]=string.char(i)end;local p=D[E[1]]or""R[1]=p;local d=256;for i=2,n do local c=E[i]local e=D[c]if e then R[i]=e;if p~=""then D[d]=p..e:sub(1,1)end elseif c==d then e=p..p:sub(1,1);R[i]=e;D[d]=e else R[i]=""end;d=d+1;p=e or p end;return loadstring(table.concat(R))end)("${escapedEnc}",${codes.length})(...)`;
-          } catch (error) {
-            throw new Error(`Compression failed: ${error.message}`);
-          }
-        }
-      };
-
-      let currentFileName = 'compressed';
-
-      const input = document.getElementById('input');
-      const output = document.getElementById('output');
-      const inputSize = document.getElementById('inputSize');
-      const outputSize = document.getElementById('outputSize');
-      const ratioNumber = document.getElementById('ratioNumber');
-      const spaceSaved = document.getElementById('spaceSaved');
-      const processingTime = document.getElementById('processingTime');
-
-      function formatBytes(b) {
-        if (!b) return '0 bytes';
-        if (b < 1024) return b + ' bytes';
-        if (b < 1024 * 1024) return (b / 1024).toFixed(2) + ' KB';
-        return (b / (1024 * 1024)).toFixed(2) + ' MB';
-      }
-
-      function updateSizes() {
-        const i = new Blob([input.value]).size;
-        const o = new Blob([output.value]).size;
-        inputSize.textContent = formatBytes(i);
-        outputSize.textContent = formatBytes(o);
-        
-        if (i && o && o > 0) {
-          const p = ((1 - o / i) * 100).toFixed(1);
-          const saved = i - o;
-          
-          ratioNumber.textContent = `${p}%`;
-          spaceSaved.textContent = formatBytes(saved);
-          
-          if (p > 0) {
-            ratioNumber.className = 'stat-value success';
-          } else if (p < 0) {
-            ratioNumber.className = 'stat-value error';
-          } else {
-            ratioNumber.className = 'stat-value';
-          }
-        } else {
-          ratioNumber.textContent = '0%';
-          spaceSaved.textContent = '0 bytes';
-          ratioNumber.className = 'stat-value';
-        }
-      }
-
-      input.addEventListener('input', () => {
-        updateSizes();
-        if (output.value) {
-          output.value = '';
-          updateSizes();
-        }
-      });
-
-      function compress() {
-        if (!input.value.trim()) {
-          toast('Enter some Lua code first', true);
-          return;
-        }
-        
-        const startTime = performance.now();
-        
-        try {
-          output.value = LZW.compress(input.value);
-          const endTime = performance.now();
-          const timeTaken = endTime - startTime;
-          
-          processingTime.textContent = `${Math.round(timeTaken)}ms`;
-          updateSizes();
-          toast('Code compressed successfully!');
-        } catch (e) {
-          const errorMsg = e.message || 'Unknown compression error';
-          toast(errorMsg, true);
-        }
-      }
-
-      function downloadOutput() {
-        if (!output.value) {
-          toast('Nothing to download', true);
-          return;
-        }
-        
-        try {
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(new Blob([output.value], { type: 'text/plain' }));
-          a.download = `${currentFileName}_compressed.lua`;
-          a.click();
-          URL.revokeObjectURL(a.href);
-          toast('Download started!');
-        } catch (e) {
-          toast('Download failed', true);
-        }
-      }
-
-      document.getElementById('fileInput').addEventListener('change', e => {
-        const fileInput = e.target;
-        const f = fileInput.files[0];
-        
-        if (!f) return;
-        
-        const fileName = f.name.toLowerCase();
-        const isValidExtension = fileName.endsWith('.lua') || fileName.endsWith('.txt');
-        
-        if (!isValidExtension) {
-          toast('Only .lua and .txt files are allowed', true);
-          fileInput.value = '';
-          return;
-        }
-        
-        const minSize = 1.5 * 1024;
-        if (f.size < minSize) {
-          const fileSizeKB = (f.size / 1024).toFixed(2);
-          toast(`File too small (${fileSizeKB} KB). Minimum is 1.50 KB`, true);
-          fileInput.value = '';
-          return;
-        }
-        
-        const nameWithoutExt = f.name.replace(/\.(lua|txt)$/i, '');
-        currentFileName = nameWithoutExt;
-        
-        const maxSize = 5 * 1024 * 1024;
-        if (f.size > maxSize) {
-          const fileSizeMB = (f.size / (1024 * 1024)).toFixed(2);
-          toast(`File too large (${fileSizeMB} MB). Maximum is 5.00 MB`, true);
-          fileInput.value = '';
-          return;
-        }
-        
-        const r = new FileReader();
-        r.onload = e => {
-          input.value = e.target.result;
-          output.value = '';
-          updateSizes();
-          const loadedSizeKB = (new Blob([e.target.result]).size / 1024).toFixed(2);
-          toast(`File loaded (${loadedSizeKB} KB)`);
-        };
-        r.onerror = () => {
-          toast('Failed to read file', true);
-          fileInput.value = '';
-        };
-        r.readAsText(f);
-      });
-
-      function toast(msg, isError = false) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = 'toast show ' + (isError ? 'error' : 'success');
-        
-        setTimeout(() => {
-          t.className = 'toast';
-        }, 3000);
-      }
-
-      updateSizes();
-    </script>
-  </body>
-</html>
+<!DOCTYPE html><html lang="en">  <head>    <meta charset="UTF-8" />    <meta name="viewport" content="width=device-width, initial-scale=1.0" />    <title>Lua Compressor</title>    <style>      * {        margin: 0;        padding: 0;        box-sizing: border-box;        -webkit-tap-highlight-color: transparent;        -webkit-touch-callout: none;        -webkit-user-select: none;        -moz-user-select: none;        -ms-user-select: none;        user-select: none;      }      textarea {        -webkit-user-select: text;        -moz-user-select: text;        -ms-user-select: text;        user-select: text;      }      body {        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;        background: #0a0e1a;        color: #e2e8f0;        padding: 20px;        line-height: 1.6;      }      .container {        max-width: 900px;        margin: 0 auto;      }      header {        text-align: center;        margin-bottom: 40px;      }      h1 {        font-size: 28px;        font-weight: 600;        color: #fff;        margin-bottom: 8px;      }      .subtitle {        color: #94a3b8;        font-size: 14px;      }      .section {        background: #151b2b;        border: 1px solid #1f2937;        border-radius: 8px;        padding: 20px;        margin-bottom: 20px;      }      .section-header {        display: flex;        justify-content: space-between;        align-items: center;        margin-bottom: 12px;      }      .section-title {        font-size: 13px;        font-weight: 600;        color: #94a3b8;        text-transform: uppercase;        letter-spacing: 0.5px;      }      .file-size {        font-size: 12px;        color: #64748b;      }      textarea {        width: 100%;        height: 200px;        background: #0a0e1a;        border: 1px solid #1f2937;        border-radius: 6px;        padding: 12px;        color: #e2e8f0;        font-family: 'Courier New', monospace;        font-size: 13px;        resize: none;        outline: none;      }      textarea:focus {        border-color: #3b82f6;      }      textarea::placeholder {        color: #475569;      }      .btn-group {        display: flex;        gap: 12px;        margin-bottom: 20px;      }      button, .btn {        padding: 12px 24px;        border: none;        border-radius: 6px;        font-size: 14px;        font-weight: 500;        cursor: pointer;        transition: all 0.2s;        display: inline-flex;        align-items: center;        justify-content: center;        gap: 8px;        outline: none;        position: relative;        width: 100%;        box-sizing: border-box;      }      button:active, .btn:active {        transform: scale(0.97);      }      button::after, .btn::after {        content: '';        position: absolute;        top: 0;        left: 0;        right: 0;        bottom: 0;        border-radius: 6px;        background: rgba(255, 255, 255, 0.1);        opacity: 0;        transition: opacity 0.3s;        pointer-events: none;      }      button:active::after, .btn:active::after {        opacity: 1;        transition: opacity 0s;      }      .btn-primary {        background: #3b82f6;        color: #fff;        flex: 1;      }      .btn-primary:hover {        background: #2563eb;      }      .btn-secondary {        background: #1f2937;        color: #e2e8f0;        border: 1px solid #374151;        flex: 1;      }      .btn-secondary:hover {        background: #374151;      }      .btn-success {        background: #10b981;        color: #fff;      }      .btn-success:hover {        background: #059669;      }      .stats {        display: grid;        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));        gap: 12px;      }      .stat-card {        background: #0a0e1a;        border: 1px solid #1f2937;        border-radius: 6px;        padding: 16px;      }      .stat-label {        font-size: 11px;        color: #64748b;        text-transform: uppercase;        letter-spacing: 0.5px;        margin-bottom: 4px;      }      .stat-value {        font-size: 20px;        font-weight: 600;        color: #3b82f6;      }      .stat-value.success {        color: #10b981;      }      .stat-value.error {        color: #ef4444;      }      .toast {        position: fixed;        bottom: 20px;        left: 50%;        transform: translateX(-50%);        background: #1f2937;        border: 1px solid #374151;        padding: 12px 20px;        border-radius: 6px;        font-size: 14px;        opacity: 0;        transition: opacity 0.3s;        z-index: 1000;      }      .toast.show {        opacity: 1;      }      .toast.success {        background: #065f46;        border-color: #10b981;      }      .toast.error {        background: #7f1d1d;        border-color: #ef4444;      }      input[type="file"] {        display: none;      }      .info {        text-align: center;        color: #64748b;        font-size: 12px;        margin-top: 30px;        padding: 12px;        background: #0a0e1a;        border: 1px solid #1f2937;        border-radius: 6px;      }      @media (max-width: 600px) {        .btn-group {          flex-direction: column;        }        .stats {          grid-template-columns: 1fr;        }      }    </style>  </head>  <body>    <div class="container">      <header>        <h1>Lua Compressor</h1>        <p class="subtitle">Compress your Lua code efficiently with Base88</p>      </header>      <div class="section">        <div class="section-header">          <span class="section-title">Input Code</span>          <span class="file-size" id="inputSize">0 bytes</span>        </div>        <textarea id="input" placeholder="Paste your Lua code here..."></textarea>      </div>      <div class="btn-group">        <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">          Upload File        </button>        <input type="file" id="fileInput" accept=".lua,.txt" style="display: none;" />        <button class="btn btn-primary" onclick="compress()">Compress Code</button>      </div>      <div class="section">        <div class="section-header">          <span class="section-title">Output</span>          <div style="display: flex; align-items: center; gap: 12px;">            <span class="file-size" id="outputSize">0 bytes</span>            <button class="btn btn-success" onclick="downloadOutput()" style="padding: 8px 16px; font-size: 13px;">              Download            </button>          </div>        </div>        <textarea id="output" placeholder="Compressed output will appear here..." readonly></textarea>      </div>      <div class="stats">        <div class="stat-card">          <div class="stat-label">Compression</div>          <div class="stat-value" id="ratioNumber">0%</div>        </div>        <div class="stat-card">          <div class="stat-label">Space Saved</div>          <div class="stat-value" id="spaceSaved">0 bytes</div>        </div>        <div class="stat-card">          <div class="stat-label">Time</div>          <div class="stat-value" id="processingTime">0ms</div>        </div>      </div>      <div class="info">        Supports Lua files up to 5MB • Minimum 1.5KB • Base88 encoding      </div>    </div>    <div id="toast" class="toast"></div>    <script>      function removeLuaComments(code) {        let result = '';        let i = 0;        const len = code.length;        while (i < len) {          const char = code[i];          if (char !== '-' && char !== '"' && char !== "'" && char !== '[') {            result += char;            i++;            continue;          }          const nextChar = code[i + 1] || '';          if (char === '"' || char === "'") {            const r = parseStringFast(code, i, char, len);            result += r.content;            i = r.endIndex;            continue;          }          if (char === '[') {            const lb = matchLongBracketFast(code, i, false, len);            if (lb) {              result += lb.content;              i = lb.endIndex;              continue;            }            result += char;            i++;            continue;          }          if (char === '-' && nextChar === '-') {            const after = i + 2;            if (code[after] === '[') {              const lb = matchLongBracketFast(code, after, true, len);              if (lb) {                i = lb.endIndex;                if (code[i] === '\n') result += '\n', i++;                continue;              }            }            while (i < len && code[i] !== '\n') i++;            if (code[i] === '\n') result += '\n', i++;            continue;          }          result += char;          i++;        }        return result;      }      function parseStringFast(code, start, quote, len) {        let out = code[start];        let i = start + 1;        while (i < len) {          const c = code[i];          if (c === quote) {            out += c;            i++;            break;          }          if (c === '\\' && i + 1 < len) {            out += c + code[i + 1];            i += 2;            continue;          }          out += c;          i++;        }        return { content: out, endIndex: i };      }      function matchLongBracketFast(code, start, isComment, len) {        if (code[start] !== '[') return null;        let i = start + 1;        let eq = 0;        while (code[i] === '=') eq++, i++;        if (code[i] !== '[') return null;        i++;        const close = ']' + '='.repeat(eq) + ']';        const end = code.indexOf(close, i);        if (end === -1) return null;        return {          content: isComment ? '' : code.slice(start, end + close.length),          endIndex: end + close.length        };      }      const LZW = {        // Base88 character set - SAFE for Lua strings        // Avoids: \ " ' [ ] (backslash, quotes, square brackets)        // Uses: A-Z a-z 0-9 and safe symbols only        CHARS: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,-./:;<=>?@^_{|}~ ',        encode(codes) {          if (!Array.isArray(codes) || codes.length === 0) {            throw new Error('Invalid codes array');          }          const bytes = [];          let bits = 0, nb = 0;          let width = 9, limit = 512, size = 258;          for (let i = 0; i < codes.length; i++) {            const c = codes[i];            if (typeof c !== 'number' || c < 0 || c > 65535 || !Number.isFinite(c)) {              throw new Error(`Invalid code at index ${i}: ${c}`);            }            bits |= c << nb;            nb += width;            while (nb >= 8) {              bytes.push(bits & 255);              bits >>= 8;              nb -= 8;            }            size++;            if (size > limit && width < 16) {              width++;              limit <<= 1;            }          }          if (nb > 0) bytes.push(bits & 255);          // Base88 encoding (more efficient than Base85)          let out = '';          for (let i = 0; i < bytes.length; i += 4) {            let v =              (bytes[i] || 0) |              ((bytes[i + 1] || 0) << 8) |              ((bytes[i + 2] || 0) << 16) |              ((bytes[i + 3] || 0) << 24);            v >>>= 0;            // Encode 4 bytes into ~4.55 Base88 characters            for (let j = 0; j < 5; j++) {              // Early stop if value is 0 and we're not on first digit              if (v === 0 && j > 0) break;              const idx = v % 88;              if (idx < 0 || idx >= this.CHARS.length) {                throw new Error('Encoding index out of range');              }              out += this.CHARS[idx];              v = Math.floor(v / 88);            }          }          return out;        },        compress(input) {          try {            if (typeof input !== 'string') {              throw new Error('Input must be a string');            }            if (input.trim().length === 0) {              throw new Error('Input is empty');            }            let cleaned = removeLuaComments(input);            if (!cleaned.trim()) {              throw new Error('No code remaining after removing comments');            }            const encoder = new TextEncoder();            let bytes;            try {              bytes = encoder.encode(cleaned);            } catch (encodeError) {              throw new Error('Invalid Unicode characters in code');            }            if (bytes.length === 0) {              throw new Error('No compressible content found');            }            const dict = new Map();            for (let i = 0; i < 256; i++) {              dict.set(String.fromCharCode(i), i);            }            let w = '';            let size = 256;            const codes = [];            const maxDictSize = 65536;            for (const b of bytes) {              const c = String.fromCharCode(b);              const wc = w + c;              if (dict.has(wc)) {                w = wc;              } else {                const code = dict.get(w);                if (code === undefined) {                  throw new Error('Dictionary lookup failed');                }                codes.push(code);                if (size < maxDictSize) {                  dict.set(wc, size++);                }                w = c;              }            }            if (w) {              const code = dict.get(w);              if (code === undefined) {                throw new Error('Final dictionary lookup failed');              }              codes.push(code);            }            if (codes.length === 0) {              throw new Error('No compressible content found');            }            const enc = this.encode(codes);            if (!enc || enc.length === 0) {              throw new Error('Encoding failed');            }            // No need to escape characters since CHARS is Lua-safe!            const escapedEnc = enc; // No escaping needed            const escapedChars = this.CHARS; // No escaping needed            if (codes.length > 1000000) {              throw new Error('Compressed output too large');            }            // Base88 decompressor wrapper            return `return(function(s,n)local C="${escapedChars}"local B,b,w,t,z={},0,9,512,258;for i=1,#s,5 do local v=0;for j=0,4 do local idx=(C:find(s:sub(i+j,i+j),1,1)or 1)-1;v=v+idx*88^j end;for k=0,3 do B[#B+1]=v//256^k%256 end end;local E,x,y={},1,0;for i=1,n do while y<w do b=b+(B[x]or 0)*2^y;x=x+1;y=y+8 end;E[i]=b%2^w;b=b//2^w;y=y-w;z=z+1;if z>t and w<16 then w=w+1;t=t*2 end end;local D,R={},{}for i=0,255 do D[i]=string.char(i)end;local p=D[E[1]]or""R[1]=p;local d=256;for i=2,n do local c=E[i]local e=D[c]if e then R[i]=e;if p~=""then D[d]=p..e:sub(1,1)end elseif c==d then e=p..p:sub(1,1);R[i]=e;D[d]=e else R[i]=""end;d=d+1;p=e or p end;return loadstring(table.concat(R))end)("${escapedEnc}",${codes.length})(...)`;          } catch (error) {            throw new Error(`Compression failed: ${error.message}`);          }        }      };      let currentFileName = 'compressed';      const input = document.getElementById('input');      const output = document.getElementById('output');      const inputSize = document.getElementById('inputSize');      const outputSize = document.getElementById('outputSize');      const ratioNumber = document.getElementById('ratioNumber');      const spaceSaved = document.getElementById('spaceSaved');      const processingTime = document.getElementById('processingTime');      const toast = document.getElementById('toast');      function formatBytes(b) {        if (!b) return '0 bytes';        if (b < 1024) return b + ' bytes';        if (b < 1024 * 1024) return (b / 1024).toFixed(2) + ' KB';        return (b / (1024 * 1024)).toFixed(2) + ' MB';      }      function updateSizes() {        const i = new Blob([input.value]).size;        const o = new Blob([output.value]).size;        inputSize.textContent = formatBytes(i);        outputSize.textContent = formatBytes(o);        if (i && o && o > 0) {          const p = ((1 - o / i) * 100).toFixed(1);          const saved = i - o;          ratioNumber.textContent = `${p}%`;          spaceSaved.textContent = formatBytes(saved);          if (p > 0) {            ratioNumber.className = 'stat-value success';          } else if (p < 0) {            ratioNumber.className = 'stat-value error';          } else {            ratioNumber.className = 'stat-value';          }        } else {          ratioNumber.textContent = '0%';          spaceSaved.textContent = '0 bytes';          ratioNumber.className = 'stat-value';        }      }      input.addEventListener('input', () => {        updateSizes();        if (output.value) {          output.value = '';          updateSizes();        }      });      function compress() {        if (!input.value.trim()) {          showToast('Enter some Lua code first', 'error');          return;        }        const startTime = performance.now();        try {          output.value = LZW.compress(input.value);          const endTime = performance.now();          const timeTaken = endTime - startTime;          processingTime.textContent = `${Math.round(timeTaken)}ms`;          updateSizes();          showToast('Code compressed successfully!');        } catch (e) {          const errorMsg = e.message || 'Unknown compression error';          showToast(errorMsg, 'error');        }      }      function downloadOutput() {        if (!output.value) {          showToast('Nothing to download', 'error');          return;        }        try {          const a = document.createElement('a');          a.href = URL.createObjectURL(new Blob([output.value], { type: 'text/plain' }));          a.download = `${currentFileName}_compressed.lua`;          a.click();          URL.revokeObjectURL(a.href);          showToast('Download started!');        } catch (e) {          showToast('Download failed', 'error');        }      }      document.getElementById('fileInput').addEventListener('change', e => {        const fileInput = e.target;        const f = fileInput.files[0];        if (!f) return;        const fileName = f.name.toLowerCase();        const isValidExtension = fileName.endsWith('.lua') || fileName.endsWith('.txt');        if (!isValidExtension) {          showToast('Only .lua and .txt files are allowed', 'error');          fileInput.value = '';          return;        }        const minSize = 1.5 * 1024;        if (f.size < minSize) {          const fileSizeKB = (f.size / 1024).toFixed(2);          showToast(`File too small (${fileSizeKB} KB). Minimum is 1.50 KB`, 'error');          fileInput.value = '';          return;        }        const nameWithoutExt = f.name.replace(/\.(lua|txt)$/i, '');        currentFileName = nameWithoutExt;        const maxSize = 5 * 1024 * 1024;        if (f.size > maxSize) {          const fileSizeMB = (f.size / (1024 * 1024)).toFixed(2);          showToast(`File too large (${fileSizeMB} MB). Maximum is 5.00 MB`, 'error');          fileInput.value = '';          return;        }        const r = new FileReader();        r.onload = e => {          input.value = e.target.result;          output.value = '';          updateSizes();          const loadedSizeKB = (new Blob([e.target.result]).size / 1024).toFixed(2);          showToast(`File loaded (${loadedSizeKB} KB)`);        };        r.onerror = () => {          showToast('Failed to read file', 'error');          fileInput.value = '';        };        r.readAsText(f);      });      function showToast(message, type = 'success') {        toast.textContent = message;        toast.className = 'toast';        toast.classList.add(type);        // Show        setTimeout(() => {          toast.classList.add('show');        }, 10);        // Hide after 3 seconds        setTimeout(() => {          toast.classList.remove('show');        }, 3000);      }      updateSizes();    </script>  </body></html>
