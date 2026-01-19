@@ -10,16 +10,18 @@
         padding: 0;
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
-        outline: none;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
       }
 
-      *:focus {
-        outline: none;
-      }
-
-      *::selection {
-        background: #3b82f6;
-        color: #fff;
+      textarea {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
       }
 
       body {
@@ -120,12 +122,33 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        user-select: none;
-        -webkit-user-select: none;
+        outline: none;
+        position: relative;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       button:active, .btn:active {
-        transform: scale(0.96);
+        transform: scale(0.97);
+      }
+
+      button::after, .btn::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+
+      button:active::after, .btn:active::after {
+        opacity: 1;
+        transition: opacity 0s;
       }
 
       .btn-primary {
@@ -142,6 +165,7 @@
         background: #1f2937;
         color: #e2e8f0;
         border: 1px solid #374151;
+        flex: 1;
       }
 
       .btn-secondary:hover {
@@ -263,10 +287,10 @@
       </div>
 
       <div class="btn-group">
-        <label class="btn btn-secondary">
+        <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
           Upload File
-          <input type="file" id="fileInput" accept=".lua,.luau,.txt" />
-        </label>
+        </button>
+        <input type="file" id="fileInput" accept=".lua,.txt" style="display: none;" />
         <button class="btn btn-primary" onclick="compress()">Compress Code</button>
       </div>
 
@@ -405,7 +429,7 @@
       }
 
       const LZW = {
-        CHARS: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,-./:;<=>?@^_`|~',
+        CHARS: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,-./:;<=>?@[]^_`{|}~"',
 
         encode(codes) {
           if (!Array.isArray(codes) || codes.length === 0) {
@@ -649,10 +673,10 @@
         if (!f) return;
         
         const fileName = f.name.toLowerCase();
-        const isValidExtension = fileName.endsWith('.lua') || fileName.endsWith('.luau') || fileName.endsWith('.txt');
+        const isValidExtension = fileName.endsWith('.lua') || fileName.endsWith('.txt');
         
         if (!isValidExtension) {
-          toast('Only .lua, .luau and .txt files are allowed', true);
+          toast('Only .lua and .txt files are allowed', true);
           fileInput.value = '';
           return;
         }
@@ -665,7 +689,7 @@
           return;
         }
         
-        const nameWithoutExt = f.name.replace(/\.(lua|luau|txt)$/i, '');
+        const nameWithoutExt = f.name.replace(/\.(lua|txt)$/i, '');
         currentFileName = nameWithoutExt;
         
         const maxSize = 5 * 1024 * 1024;
