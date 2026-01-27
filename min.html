@@ -4,211 +4,230 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lua Compressor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
 
       body {
-        font-family: 'Nunito', 'Rounded', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        background: #0a0e1a;
-        color: #c9d1d9;
-        padding: 40px 20px;
-        line-height: 1.6;
+        font-family: 'Inter', sans-serif;
+        background: #1a1a1a;
       }
 
-      .container {
-        max-width: 1000px;
-        margin: 0 auto;
-      }
-
-      h1 {
-        font-size: 22px;
-        font-weight: 600;
-        margin-bottom: 32px;
-        color: #ffffff;
-        text-align: center;
-      }
-
-      .section {
-        margin-bottom: 24px;
-      }
-
-      .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 6px;
-      }
-
-      .section-header-left {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      label {
-        font-size: 12px;
-        font-weight: 500;
-        color: #6e7681;
-      }
-
-      .file-size {
-        font-size: 11px;
-        color: #58a6ff;
-        font-weight: 400;
-      }
-
-      .section-btn {
-        padding: 4px 12px;
-        border: 1px solid #30363d;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 500;
-        cursor: pointer;
-        background: transparent;
-        color: #8b949e;
-        transition: all 0.15s;
-      }
-
-      .section-btn:hover {
-        color: #c9d1d9;
-        border-color: #8b949e;
-      }
-
-      .section-btn:active {
-        transform: scale(0.98);
+      .code-font {
+        font-family: 'JetBrains Mono', monospace;
       }
 
       textarea {
-        width: 100%;
-        height: 200px;
-        background: #0d1117;
-        border: 1px solid #21262d;
-        border-radius: 4px;
-        padding: 12px;
-        color: #e6edf3;
-        font-family: 'Nunito', 'Rounded', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 13px;
         resize: none;
-        outline: none;
-        transition: border-color 0.15s;
+        transition: all 0.2s ease;
       }
 
       textarea:focus {
-        border-color: #58a6ff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
       }
 
-      .actions {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 24px;
+      textarea::-webkit-scrollbar {
+        width: 6px;
       }
 
-      button {
-        padding: 8px 16px;
-        border: 1px solid #21262d;
-        border-radius: 4px;
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
-        background: #0d1117;
-        color: #c9d1d9;
-        transition: all 0.15s;
+      textarea::-webkit-scrollbar-track {
+        background: #242424;
+        border-radius: 3px;
       }
 
-      button:hover {
-        border-color: #58a6ff;
-        background: #161b22;
+      textarea::-webkit-scrollbar-thumb {
+        background: #505050;
+        border-radius: 3px;
+      }
+
+      textarea::-webkit-scrollbar-thumb:hover {
+        background: #606060;
+      }
+
+      button, label {
+        transition: all 0.15s ease;
       }
 
       button:active {
         transform: scale(0.98);
       }
 
-      .btn-primary {
-        background: #238636;
-        color: #ffffff;
-        border-color: #238636;
-        width: 100%;
-        padding: 10px;
+      @media (max-width: 768px) {
+        .container-padding {
+          padding: 1rem;
+        }
+
+        .textarea-height {
+          height: 40vh;
+          min-height: 200px;
+        }
+
+        .title-size {
+          font-size: 1.5rem;
+        }
+
+        .section-margin {
+          margin-bottom: 2rem;
+        }
+
+        .button-margin {
+          margin-bottom: 1.5rem;
+        }
+
+        .gap-size {
+          gap: 0.75rem;
+        }
+
+        .button-padding {
+          padding-left: 1rem;
+          padding-right: 1rem;
+          padding-top: 0.5rem;
+          padding-bottom: 0.5rem;
+        }
+
+        .text-size {
+          font-size: 0.875rem;
+        }
       }
 
-      .btn-primary:hover {
-        background: #2ea043;
-        border-color: #2ea043;
-      }
+      @media (min-width: 769px) {
+        .container-padding {
+          padding: 2rem;
+        }
 
-      input[type="file"] {
-        display: none;
-      }
+        .textarea-height {
+          height: 320px;
+        }
 
-      .toast {
-        position: fixed;
-        bottom: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #161b22;
-        color: #58a6ff;
-        padding: 10px 16px;
-        border-radius: 6px;
-        font-size: 13px;
-        opacity: 0;
-        transition: opacity 0.2s;
-        border: 1px solid #30363d;
-      }
+        .title-size {
+          font-size: 1.875rem;
+        }
 
-      .toast.show {
-        opacity: 1;
-      }
+        .section-margin {
+          margin-bottom: 3rem;
+        }
 
-      .toast.error {
-        background: #da3633;
-        color: #fff;
-        border-color: #da3633;
+        .button-margin {
+          margin-bottom: 1.5rem;
+        }
+
+        .gap-size {
+          gap: 1rem;
+        }
+
+        .button-padding {
+          padding-left: 1rem;
+          padding-right: 1rem;
+          padding-top: 0.5rem;
+          padding-bottom: 0.5rem;
+        }
+
+        .text-size {
+          font-size: 0.875rem;
+        }
       }
     </style>
   </head>
-  <body>
-    <div class="container">
-      <h1>Lua Compressor</h1>
 
-      <div class="section">
-        <div class="section-header">
-          <div class="section-header-left">
-            <label>Input</label>
-            <span class="file-size" id="inputSize">0 B</span>
+  <body class="min-h-screen text-white">
+    <div class="max-w-4xl mx-auto container-padding">
+      <div class="mb-12 text-center section-margin">
+        <h1 class="title-size font-semibold text-white mb-2 tracking-tight">Lua Compressor</h1>
+        <p class="text-size text-neutral-400">Remove comments & compress with LZW</p>
+      </div>
+
+      <div class="mb-6 section-margin">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-size font-medium text-neutral-400 uppercase tracking-wider">Input</span>
+          <div class="flex items-center gap-size">
+            <div class="text-size text-neutral-500 font-mono tabular-nums" id="inputSize">0 bytes</div>
+            <label class="cursor-pointer text-size text-neutral-300 hover:text-white transition-all bg-neutral-800 hover:bg-neutral-700 button-padding rounded-lg border border-neutral-700 hover:border-neutral-600 font-medium">
+              <span>Upload</span>
+              <input type="file" id="fileInput" accept=".lua,.txt,.luau" class="hidden" />
+            </label>
           </div>
-          <button class="section-btn" onclick="document.getElementById('fileInput').click()">Upload</button>
         </div>
-        <textarea id="input" placeholder="Paste Lua code here"></textarea>
+
+        <textarea
+          id="input"
+          class="code-font w-full textarea-height p-4 bg-neutral-900 border border-neutral-700 rounded-xl text-size leading-relaxed text-neutral-100 focus:outline-none focus:border-neutral-600 focus:ring-2 focus:ring-neutral-700 placeholder-neutral-600 transition-all"
+          placeholder="Paste Lua code here..."
+        ></textarea>
       </div>
 
-      <div class="actions">
-        <button class="btn-primary" onclick="compress()">Compress</button>
+      <div class="mb-6 button-margin">
+        <button
+          onclick="compress()"
+          class="w-full py-3.5 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 hover:border-neutral-600 rounded-xl text-base font-semibold transition-all shadow-lg hover:shadow-xl tracking-wide"
+        >
+          Compress
+        </button>
       </div>
 
-      <div class="section">
-        <div class="section-header">
-          <div class="section-header-left">
-            <label>Output</label>
-            <span class="file-size" id="outputSize">0 B</span>
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-size">
+            <span class="text-size font-medium text-neutral-400 uppercase tracking-wider">Output</span>
+            <div id="ratio" class="text-size font-semibold"></div>
           </div>
-          <button class="section-btn" onclick="downloadOutput()">Download</button>
+          <div class="flex items-center gap-size">
+            <div class="text-size text-neutral-500 font-mono tabular-nums" id="outputSize">0 bytes</div>
+            <button
+              onclick="downloadOutput()"
+              class="text-size text-neutral-300 hover:text-white transition-all bg-neutral-800 hover:bg-neutral-700 button-padding rounded-lg border border-neutral-700 hover:border-neutral-600 font-medium"
+            >
+              Download
+            </button>
+          </div>
         </div>
-        <textarea id="output" placeholder="Compressed output" readonly></textarea>
-      </div>
 
-      <input type="file" id="fileInput" accept=".lua,.luau,.txt" />
+        <textarea
+          id="output"
+          class="code-font w-full textarea-height p-4 bg-neutral-900 border border-neutral-700 rounded-xl text-size leading-relaxed text-neutral-100 focus:outline-none focus:border-neutral-600 focus:ring-2 focus:ring-neutral-700 placeholder-neutral-600 transition-all"
+          placeholder="Compressed output..."
+          readonly
+        ></textarea>
+      </div>
     </div>
 
-    <div id="toast" class="toast"></div>
+    <div
+      id="toast"
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 bg-neutral-800 border border-neutral-700 text-white text-size rounded-xl shadow-2xl opacity-0 transition-opacity duration-300 pointer-events-none font-medium"
+    ></div>
 
     <script>
+      // Clear all form data on page load to prevent persistence
+      window.addEventListener('load', function() {
+        try {
+          document.getElementById('input').value = '';
+          document.getElementById('output').value = '';
+          document.getElementById('fileInput').value = '';
+          currentFileName = 'compressed';
+          updateSizes();
+        } catch (e) {
+          console.error('Failed to clear form on load:', e);
+        }
+      });
+
+      // Prevent form data from being saved in session history
+      window.addEventListener('beforeunload', function() {
+        try {
+          document.getElementById('input').value = '';
+          document.getElementById('output').value = '';
+          document.getElementById('fileInput').value = '';
+        } catch (e) {
+          console.error('Failed to clear form on unload:', e);
+        }
+      });
+
       function removeLuaComments(code) {
+        if (typeof code !== 'string') {
+          throw new Error('Input must be a string');
+        }
+
         let result = '';
         let i = 0;
         const len = code.length;
@@ -265,6 +284,10 @@
       }
 
       function parseStringFast(code, start, quote, len) {
+        if (typeof code !== 'string' || typeof start !== 'number' || typeof quote !== 'string' || typeof len !== 'number') {
+          throw new Error('Invalid parameters for parseStringFast');
+        }
+
         let out = code[start];
         let i = start + 1;
 
@@ -288,6 +311,10 @@
       }
 
       function matchLongBracketFast(code, start, isComment, len) {
+        if (typeof code !== 'string' || typeof start !== 'number' || typeof isComment !== 'boolean' || typeof len !== 'number') {
+          throw new Error('Invalid parameters for matchLongBracketFast');
+        }
+
         if (code[start] !== '[') return null;
         let i = start + 1;
         let eq = 0;
@@ -307,11 +334,15 @@
       }
 
       const LZW = {
-        CHARS: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_.,;:!?@#$%&*()[]{}+-=<>',
+        CHARS: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-*/=<>!@#$%^&()[]{}|;:,.?~_',
 
         encode(codes) {
-          if (!Array.isArray(codes) || codes.length === 0) {
-            throw new Error('Invalid codes array');
+          if (!Array.isArray(codes)) {
+            throw new Error('Codes must be an array');
+          }
+
+          if (codes.length === 0) {
+            throw new Error('Codes array cannot be empty');
           }
 
           const bytes = [];
@@ -351,7 +382,6 @@
               ((bytes[i + 3] || 0) << 24);
 
             v >>>= 0;
-            
             for (let j = 0; j < 5; j++) {
               const idx = v % 85;
               if (idx < 0 || idx >= this.CHARS.length) {
@@ -370,13 +400,21 @@
               throw new Error('Input must be a string');
             }
 
-            if (input.trim().length === 0) {
-              throw new Error('Input is empty');
+            if (input.length === 0) {
+              throw new Error('Input cannot be empty');
+            }
+
+            if (input.length > 1000000) {
+              throw new Error('Input is too large (max 1MB)');
             }
 
             let cleaned = removeLuaComments(input);
+            if (typeof cleaned !== 'string') {
+              throw new Error('Comment removal failed');
+            }
+
             if (!cleaned.trim()) {
-              throw new Error('No code remaining after removing comments');
+              throw new Error('No valid code remaining after removing comments');
             }
 
             const encoder = new TextEncoder();
@@ -384,11 +422,15 @@
             try {
               bytes = encoder.encode(cleaned);
             } catch (encodeError) {
-              throw new Error('Invalid Unicode characters in code');
+              throw new Error('Text encoding failed: ' + encodeError.message);
             }
 
             if (bytes.length === 0) {
               throw new Error('No compressible content found');
+            }
+
+            if (bytes.length > 2000000) {
+              throw new Error('Compressed data would be too large');
             }
 
             const dict = new Map();
@@ -418,7 +460,7 @@
                 w = c;
               }
             }
-            
+
             if (w) {
               const code = dict.get(w);
               if (code === undefined) {
@@ -431,19 +473,29 @@
               throw new Error('No compressible content found');
             }
 
+            if (codes.length > 1000000) {
+              throw new Error('Compressed output would be too large');
+            }
+
             const enc = this.encode(codes);
-            if (!enc || enc.length === 0) {
+            if (typeof enc !== 'string' || enc.length === 0) {
               throw new Error('Encoding failed');
             }
 
             const escapedEnc = enc.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
             const escapedChars = this.CHARS.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
-            if (codes.length > 1000000) {
-              throw new Error('Compressed output too large');
+            if (escapedEnc.length > 500000) {
+              throw new Error('Escaped output would be too large');
             }
 
-            return `return(function(...)local a,b=...local c="${escapedChars}"local d,e,f,g,h={},0,9,512,258 for i=1,#a,5 do local j=0 for k=0,4 do j=j+((c:find(a:sub(i+k,i+k),1,1)or 1)-1)*85^k end for l=0,3 do d[#d+1]=j//256^l%256 end end local m,n,o={},1,0 for i=1,b do while o<f do e=e+(d[n]or 0)*2^o n=n+1 o=o+8 end m[i]=e%2^f e=e//2^f o=o-f h=h+1 if h>g and f<16 then f=f+1 g=g*2 end end local p,q={},{}for i=0,255 do p[i]=string.char(i)end local r=p[m[1]]or""q[1]=r;local s=256 for i=2,b do local t=m[i]local u=p[t]if u then q[i]=u if r~=""then p[s]=r..u:sub(1,1)end elseif t==s then u=r..r:sub(1,1)q[i]=u p[s]=u else q[i]=""end s=s+1 r=u or r end return loadstring(table.concat(q))end)("${escapedEnc}",${codes.length})(...)`;
+            const compressedCode = `return(function(s,n)local C="${escapedChars}"local B,b,w,t,z={},0,9,512,258;for i=1,#s,5 do local v=0;for j=0,4 do v=v+((C:find(s:sub(i+j,i+j),1,1)or 1)-1)*85^j end;for k=0,3 do B[#B+1]=v//256^k%256 end end;local E,x,y={},1,0;for i=1,n do while y<w do b=b+(B[x]or 0)*2^y;x=x+1;y=y+8 end;E[i]=b%2^w;b=b//2^w;y=y-w;z=z+1;if z>t and w<16 then w=w+1;t=t*2 end end;local D,R={},{}for i=0,255 do D[i]=string.char(i)end;local p=D[E[1]]or""R[1]=p;local d=256;for i=2,n do local c=E[i]local e=D[c]if e then R[i]=e;if p~=""then D[d]=p..e:sub(1,1)end elseif c==d then e=p..p:sub(1,1);R[i]=e;D[d]=e else R[i]=""end;d=d+1;p=e or p end;return loadstring(table.concat(R))end)("${escapedEnc}",${codes.length})(...)`;
+
+            if (compressedCode.length > 1000000) {
+              throw new Error('Final compressed code would be too large');
+            }
+
+            return compressedCode;
           } catch (error) {
             throw new Error(`Compression failed: ${error.message}`);
           }
@@ -451,135 +503,240 @@
       };
 
       let currentFileName = 'compressed';
+
       const input = document.getElementById('input');
       const output = document.getElementById('output');
-      const toast = document.getElementById('toast');
       const inputSize = document.getElementById('inputSize');
       const outputSize = document.getElementById('outputSize');
+      const ratio = document.getElementById('ratio');
 
       function formatBytes(b) {
-        if (!b) return '0 B';
-        if (b < 1024) return b + ' B';
-        if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
-        return (b / (1024 * 1024)).toFixed(1) + ' MB';
+        if (!b || b === 0) return '0 bytes';
+        if (b < 1024) return b + ' bytes';
+        if (b < 1024 * 1024) return (b / 1024).toFixed(2) + ' KB';
+        return (b / (1024 * 1024)).toFixed(2) + ' MB';
       }
 
-      function updateStats() {
-        const i = new Blob([input.value]).size;
-        const o = new Blob([output.value]).size;
-        
-        inputSize.textContent = formatBytes(i);
-        outputSize.textContent = formatBytes(o);
+      function getAccurateByteSize(text) {
+        if (typeof text !== 'string') {
+          throw new Error('Text must be a string');
+        }
+
+        try {
+          const blob = new Blob([text]);
+          return blob.size;
+        } catch (e) {
+          throw new Error('Failed to calculate byte size: ' + e.message);
+        }
+      }
+
+      function updateSizes() {
+        try {
+          const inputBytes = getAccurateByteSize(input.value);
+          const outputBytes = getAccurateByteSize(output.value);
+
+          inputSize.textContent = formatBytes(inputBytes);
+          outputSize.textContent = formatBytes(outputBytes);
+
+          if (inputBytes > 0 && outputBytes > 0) {
+            const compressionRatio = ((inputBytes - outputBytes) / inputBytes) * 100;
+            const ratioValue = compressionRatio.toFixed(1);
+
+            if (compressionRatio > 0) {
+              ratio.textContent = `${ratioValue}% smaller`;
+              ratio.className = 'text-xs text-green-400';
+            } else if (compressionRatio < 0) {
+              ratio.textContent = `${Math.abs(ratioValue)}% larger`;
+              ratio.className = 'text-xs text-red-400';
+            } else {
+              ratio.textContent = 'same size';
+              ratio.className = 'text-xs text-slate-400';
+            }
+          } else {
+            ratio.textContent = '';
+          }
+        } catch (e) {
+          console.error('Size update failed:', e);
+          inputSize.textContent = 'Error';
+          outputSize.textContent = 'Error';
+          ratio.textContent = '';
+        }
       }
 
       input.addEventListener('input', () => {
-        if (output.value) {
-          output.value = '';
-          updateStats();
+        try {
+          updateSizes();
+          if (output.value) {
+            output.value = '';
+            updateSizes();
+          }
+        } catch (e) {
+          console.error('Input handler failed:', e);
         }
       });
 
       function compress() {
-        if (!input.value.trim()) {
-          showToast('Enter some Lua code first', 'error');
-          return;
-        }
-        
         try {
-          output.value = LZW.compress(input.value);
-          updateStats();
-          showToast('Compressed');
+          if (!input.value.trim()) {
+            toast('Enter some Lua code first', true);
+            return;
+          }
+
+          if (input.value.length > 1000000) {
+            toast('Input is too large (max 1MB)', true);
+            return;
+          }
+
+          output.value = 'Compressing...';
+          updateSizes();
+
+          setTimeout(() => {
+            try {
+              const result = LZW.compress(input.value);
+              output.value = result;
+              updateSizes();
+              toast('Code compressed successfully');
+            } catch (e) {
+              output.value = '';
+              updateSizes();
+              const errorMsg = e.message || 'Unknown compression error';
+              toast(errorMsg, true);
+              console.error('Compression error:', e);
+            }
+          }, 50);
         } catch (e) {
-          showToast(e.message || 'Compression error', 'error');
+          toast('Compression initialization failed', true);
+          console.error('Compression init error:', e);
         }
       }
 
       function downloadOutput() {
-        if (!output.value) {
-          showToast('Nothing to download', 'error');
-          return;
-        }
-        
         try {
-          // Force lua MIME type
-          const blob = new Blob([output.value], { type: 'application/x-lua' });
+          if (!output.value) {
+            toast('Nothing to download', true);
+            return;
+          }
+
+          if (output.value.length > 1000000) {
+            toast('Output is too large to download', true);
+            return;
+          }
+
           const a = document.createElement('a');
-          const url = URL.createObjectURL(blob);
-          
-          a.href = url;
-          
-          // Clean up the filename
-          let fileName = currentFileName;
-          
-          // Remove specific extensions
-          fileName = fileName.replace(/\.(lua|luau|txt)$/i, '');
-          
-          // Ensure it ends with .lua
-          a.download = `${fileName}.min.lua`;
-          
-          a.style.display = 'none';
-          
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          
-          setTimeout(() => URL.revokeObjectURL(url), 100);
-          showToast('Downloaded');
+          const blob = new Blob([output.value], { type: 'text/x-lua' });
+
+          if (blob.size > 1000000) {
+            toast('Output file would be too large', true);
+            return;
+          }
+
+          a.href = URL.createObjectURL(blob);
+          a.download = `${currentFileName}.min.lua`;
+
+          try {
+            a.click();
+            toast('Download started');
+          } catch (clickError) {
+            toast('Download failed: ' + clickError.message, true);
+          } finally {
+            URL.revokeObjectURL(a.href);
+          }
         } catch (e) {
-          showToast('Download failed', 'error');
+          toast('Download failed: ' + e.message, true);
+          console.error('Download error:', e);
         }
       }
 
       document.getElementById('fileInput').addEventListener('change', e => {
-        const f = e.target.files[0];
-        if (!f) return;
-        
-        const fileName = f.name.toLowerCase();
-        if (!fileName.endsWith('.lua') && !fileName.endsWith('.luau') && !fileName.endsWith('.txt')) {
-          showToast('Only .lua, .luau and .txt files', 'error');
-          e.target.value = '';
-          return;
+        try {
+          const fileInput = e.target;
+          const f = fileInput.files[0];
+
+          if (!f) return;
+
+          const fileName = f.name.toLowerCase();
+          const isValidExtension = fileName.endsWith('.lua') || fileName.endsWith('.txt') || fileName.endsWith('.luau');
+
+          if (!isValidExtension) {
+            toast('Only .lua, .luau and .txt files are allowed', true);
+            fileInput.value = '';
+            return;
+          }
+
+          const minSize = 1536;
+          if (f.size < minSize) {
+            const fileSizeKB = (f.size / 1024).toFixed(2);
+            toast(`File too small (${fileSizeKB} KB). Minimum is 1.50 KB`, true);
+            fileInput.value = '';
+            return;
+          }
+
+          const nameWithoutExt = f.name.replace(/\.(lua|txt|luau)$/i, '');
+          currentFileName = nameWithoutExt;
+
+          const maxSize = 5242880;
+          if (f.size > maxSize) {
+            const fileSizeMB = (f.size / (1024 * 1024)).toFixed(2);
+            toast(`File too large (${fileSizeMB} MB). Maximum is 5.00 MB`, true);
+            fileInput.value = '';
+            return;
+          }
+
+          const r = new FileReader();
+          r.onload = e => {
+            try {
+              input.value = e.target.result;
+              output.value = '';
+              updateSizes();
+              const loadedSizeKB = (new Blob([e.target.result]).size / 1024).toFixed(2);
+              toast(`File loaded successfully (${loadedSizeKB} KB)`);
+            } catch (loadError) {
+              toast('Failed to process file: ' + loadError.message, true);
+              fileInput.value = '';
+            }
+          };
+          r.onerror = () => {
+            toast('Failed to read file', true);
+            fileInput.value = '';
+          };
+          r.readAsText(f);
+        } catch (e) {
+          toast('File processing error: ' + e.message, true);
+          console.error('File input error:', e);
         }
-        
-        if (f.size < 1536) {
-          showToast('File too small (min 1.5 KB)', 'error');
-          e.target.value = '';
-          return;
-        }
-        
-        if (f.size > 5242880) {
-          showToast('File too large (max 5 MB)', 'error');
-          e.target.value = '';
-          return;
-        }
-        
-        // Extract filename without extension
-        currentFileName = f.name.replace(/\.[^/.]+$/, '');
-        
-        const r = new FileReader();
-        r.onload = e => {
-          input.value = e.target.result;
-          output.value = '';
-          updateStats();
-          showToast('File loaded');
-        };
-        r.onerror = () => {
-          showToast('Failed to read file', 'error');
-          e.target.value = '';
-        };
-        r.readAsText(f);
       });
 
-      function showToast(message, type = 'success') {
-        toast.textContent = message;
-        toast.className = 'toast';
-        if (type === 'error') toast.classList.add('error');
-        
-        setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => toast.classList.remove('show'), 2500);
+      function toast(msg, isError = false) {
+        try {
+          const t = document.getElementById('toast');
+          t.textContent = msg;
+          t.style.opacity = '1';
+
+          if (isError) {
+            t.style.backgroundColor = '#dc2626';
+            t.style.borderColor = '#b91c1c';
+          } else {
+            t.style.backgroundColor = '#059669';
+            t.style.borderColor = '#047857';
+          }
+
+          setTimeout(() => {
+            try {
+              t.style.opacity = '0';
+            } catch (fadeError) {
+              console.error('Toast fade error:', fadeError);
+            }
+          }, 3000);
+        } catch (e) {
+          console.error('Toast error:', e);
+        }
       }
 
-      updateStats();
+      try {
+        updateSizes();
+      } catch (initError) {
+        console.error('Initialization error:', initError);
+      }
     </script>
   </body>
 </html>
